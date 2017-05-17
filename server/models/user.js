@@ -18,7 +18,12 @@ var UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    require: true,
+    required: [true, 'password is mandatory'],
+    minlength: [6, 'password must be 2 charachters minumum']
+  },
+  name: {
+    type: String,
+    required: [true, 'name is mandatory'],
     minlength: 6
   },
   tokens: [{

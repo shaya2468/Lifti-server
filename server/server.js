@@ -7,6 +7,7 @@ const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
+var {Group} = require('./models/group');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
@@ -15,92 +16,85 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.post('/todos', authenticate, (req, res) => {
-  var todo = new Todo({
-    text: req.body.text,
-    _creator: req.user._id
+app.post('/groups', authenticate, (req, res) => {
+  var group = new Group({
+    name: req.body.name,
+    _user: req.user._id
   });
 
-  todo.save().then((doc) => {
+  group.save().then((doc) => {
     res.send(doc);
   }, (e) => {
     res.status(400).send(e);
   });
 });
 
-app.get('/todos', authenticate, (req, res) => {
-  Todo.find({
-    _creator: req.user._id
-  }).then((todos) => {
-    res.send({todos});
+app.get('/groups', authenticate, (req, res) => {
+  Group.find({
+    _user: req.user._id
+  }).then((groups) => {
+    res.send({groups});
   }, (e) => {
     res.status(400).send(e);
   });
 });
 
-app.get('/todos/:id', authenticate, (req, res) => {
+app.get('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  Todo.findOne({
+  Group.findOne({
     _id: id,
-    _creator: req.user._id
-  }).then((todo) => {
-    if (!todo) {
+    _user: req.user._id
+  }).then((group) => {
+    if (!group) {
       return res.status(404).send();
     }
 
-    res.send({todo});
+    res.send({group});
   }).catch((e) => {
     res.status(400).send();
   });
 });
 
-app.delete('/todos/:id', authenticate, (req, res) => {
+app.delete('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  Todo.findOneAndRemove({
+  Group.findOneAndRemove({
     _id: id,
-    _creator: req.user._id
-  }).then((todo) => {
-    if (!todo) {
+    _user: req.user._id
+  }).then((group) => {
+    if (!group) {
       return res.status(404).send();
     }
 
-    res.send({todo});
+    res.send({group});
   }).catch((e) => {
     res.status(400).send();
   });
 });
 
-app.patch('/todos/:id', authenticate, (req, res) => {
+app.patch('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
-  var body = _.pick(req.body, ['text', 'completed']);
+  var body = _.pick(req.body, ['name']);
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  if (_.isBoolean(body.completed) && body.completed) {
-    body.completedAt = new Date().getTime();
-  } else {
-    body.completed = false;
-    body.completedAt = null;
-  }
-
-  Todo.findOneAndUpdate({_id: id, _creator: req.user._id}, {$set: body}, {new: true}).then((todo) => {
-    if (!todo) {
+  Group.findOneAndUpdate({_id: id, _user: req.user._id}, {$set: body}, {new: true}).then((group) => {
+    if (!group) {
       return res.status(404).send();
     }
 
-    res.send({todo});
+    res.send({group});
   }).catch((e) => {
     res.status(400).send();
   })
@@ -108,7 +102,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
 
 // POST /users
 app.post('/users', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
+  var body = _.pick(req.body, ['email', 'password', 'name']);
   var user = new User(body);
 
   user.save().then(() => {
