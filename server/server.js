@@ -62,7 +62,6 @@ app.get('/groups', authenticate, (req, res) => {
   });
 });
 
-@// TODO: seperate request for members
 app.get('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
