@@ -3,7 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
-
+const uniqueValidator = require('mongoose-unique-validator');
 var UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -12,6 +12,7 @@ var UserSchema = new mongoose.Schema({
     minlength: 1,
     unique: true,
     validate: {
+      isAsync: true,
       validator: validator.isEmail,
       message: '{VALUE} is not a valid email'
     }
@@ -24,7 +25,7 @@ var UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'name is mandatory'],
-    minlength: 6
+    minlength: 2
   },
   tokens: [{
     access: {
@@ -37,6 +38,8 @@ var UserSchema = new mongoose.Schema({
     }
   }]
 });
+
+UserSchema.plugin(uniqueValidator);
 
 UserSchema.methods.toJSON = function () {
   var user = this;
