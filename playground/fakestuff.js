@@ -32,6 +32,7 @@ var saveUserPromise = function (name, email, password){
 let shaya;
 let simcha;
 let imm;
+let thisGroup;
 const { users, groups } = mongoose.connection.collections;
 users.drop(() => {
   groups.drop(() => {
@@ -60,7 +61,7 @@ users.drop(() => {
 
       let group = new Group({
         name: "zehavi",
-        _manager: shaya._id
+        _manager: shaya.id
       });
       return group.save();
     }).then((group) => {
@@ -71,6 +72,7 @@ users.drop(() => {
       if (!group) {
         console.log('error');
       }
+      thisGroup = group;
       return onDoneFillingDb(simcha);
     }).then((user) => {
       console.log('done!');
@@ -88,8 +90,19 @@ var onDoneFillingDb = function(simcha){
   console.log('done filling db');
   console.log(simcha.id);
   return Group.find({members: simcha.id}).then((res) => {
-    console.log(res);
+    queryStuff();
   });
+}
+
+var queryStuff = () => {
+  console.log('quering');
+
+  Group.findById( thisGroup.id)
+    .populate('members')
+    .then((group) => {
+      console.log(group);
+
+    });
 }
 
 

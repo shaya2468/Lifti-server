@@ -62,23 +62,32 @@ app.get('/groups', authenticate, (req, res) => {
   });
 });
 
+@// TODO: seperate request for members
 app.get('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
-
   Group.findOne({
     _id: id,
     _manager: req.user._id
-  }).then((group) => {
+  }).populate( 'members')
+  .then((group) => {
     if (!group) {
       return res.status(404).send();
     }
+    var membersFilteredInfo = group.members.map((element) => {
+      return {
+        name:element.name,
+        email:element.email
+      };
+    });
 
-    res.send({group});
+    var returnGroup = {name: group.name, members: membersFilteredInfo}
+    res.send(returnGroup);
   }).catch((e) => {
+    console.log(e);
     res.status(400).send();
   });
 });
