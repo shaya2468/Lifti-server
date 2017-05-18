@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.post('/groups', authenticate, (req, res) => {
   var group = new Group({
     name: req.body.name,
-    _user: req.user._id
+    _manager: req.user._id
   });
 
   group.save().then((doc) => {
@@ -29,9 +29,30 @@ app.post('/groups', authenticate, (req, res) => {
   });
 });
 
+app.post('/groups/join/:id', authenticate, (req, res) => {
+
+  var id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+  console.log(req.user._id);
+  //http://stackoverflow.com/questions/15921700/mongoose-unique-values-in-nested-array-of-objects
+  Group.findOneAndUpdate({_id: id, 'members': {$ne: req.user._id}}, {$push: {members: req.user._id}}).then((group) => {
+    if (!group) {
+      return res.status(404).send();
+    }
+    res.send({});
+  }).catch((e) => {
+    console.log(e);
+    res.status(400).send();
+  })
+
+});
+
 app.get('/groups', authenticate, (req, res) => {
   Group.find({
-    _user: req.user._id
+    _manager: req.user._id
   }).then((groups) => {
     res.send({groups});
   }, (e) => {
@@ -48,7 +69,7 @@ app.get('/groups/:id', authenticate, (req, res) => {
 
   Group.findOne({
     _id: id,
-    _user: req.user._id
+    _manager: req.user._id
   }).then((group) => {
     if (!group) {
       return res.status(404).send();
@@ -69,7 +90,7 @@ app.delete('/groups/:id', authenticate, (req, res) => {
 
   Group.findOneAndRemove({
     _id: id,
-    _user: req.user._id
+    _manager: req.user._id
   }).then((group) => {
     if (!group) {
       return res.status(404).send();
@@ -89,7 +110,7 @@ app.patch('/groups/:id', authenticate, (req, res) => {
     return res.status(404).send();
   }
 
-  Group.findOneAndUpdate({_id: id, _user: req.user._id}, {$set: body}, {new: true}).then((group) => {
+  Group.findOneAndUpdate({_id: id, _manager: req.user._id}, {$set: body}, {new: true}).then((group) => {
     if (!group) {
       return res.status(404).send();
     }
