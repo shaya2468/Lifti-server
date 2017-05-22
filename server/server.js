@@ -1,8 +1,18 @@
 require('./config/config');
+var
+  path = require('path'),
+
+  fs = require('fs'),
+  os = require('os'),
+  formidable = require('formidable'),
+  gm = require('gm'),
+  s3 = require('./amazon/s3.js');
+
 
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
@@ -15,7 +25,17 @@ var {authenticate} = require('./middleware/authenticate');
 var app = express();
 const port = process.env.PORT;
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-auth");
+  next();
+});
+
+app.use(bodyParser.urlencoded({
+    extended: true
+  }))
 app.use(bodyParser.json());
+app.use(methodOverride());
 
 app.post('/groups', authenticate, (req, res) => {
   var group = new Group({
@@ -149,6 +169,90 @@ app.post('/users', (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
+
+
+///////upload Started
+
+app.post('/upload', authenticate, (req, res) => {
+
+    console.log('i go to upload route');
+    function generateFileName(filename){
+      console.log(filename);
+      var ext_regex = /(?:\.([^.]+))?$/;
+      var ext = ext_regex.exec(filename)[1];
+      var date = new Date().getTime();
+      var charBank = "abcdefghijklmnopqrstuvwxyz";
+      var fstring = '';
+      for (var i = 0; i<15; i ++){
+        fstring += charBank[parseInt(Math.random()*26)];
+
+      }
+      return (fstring += date + '.' + ext);
+    }
+
+
+    var tmpFile, nFile, fname;
+    var newForm = new formidable.IncomingForm();
+        newForm.keepExtensions = true,
+        newForm.parse(req, function(err, fields, files){
+        console.log('error');
+        console.log(err);
+        console.log(fields);
+
+         tmpFile = files.upload.path;
+         fname = generateFileName(files.upload.name);
+         console.log(fname);
+         //temp directory on the server
+         nfile = os.tmpDir() + '/' + fname;
+       });
+
+        newForm.on('end', function (){
+          fs.rename(tmpFile, nfile, function (){
+            // resize the image and we will upload this file into the s3 bucket
+            // does not work on heroku
+            gm(nfile).resize(300).write(nfile, function(){
+
+              var uploadParams = {Bucket: process.env.S3_BUCKET, Key: '', Body: ''};
+              uploadParams.Key = fname;
+              var fileStream = fs.createReadStream(nfile);
+
+              fileStream.on('error', function(err) {
+                console.log('no such file stupid');
+              });
+              uploadParams.Body = fileStream;
+
+              s3.upload (uploadParams, function (err, data) {
+              if (err) {
+                console.log("Error", err);
+                res.status(404).end();
+                //next('take this already')
+              } if (data) {
+                console.log("Upload Success", data.Location);
+                res.status(200);
+                res.send('success');
+
+                // var newImage = new singleImageModel({
+                //   fileName: fname,
+                //   votes: 0
+                // }).save(function (err, data) {
+                //   console.log(data);
+                // });
+
+                fs.unlink(nfile, function () {
+                  console.log(os.tmpDir());
+                  console.log('local file deleted');
+                });
+
+              }
+              });
+            });
+          });
+        });
+});
+
+
+
+////upload ended
 
 app.post('/users/login', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
