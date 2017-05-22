@@ -27,6 +27,9 @@ var UserSchema = new mongoose.Schema({
     required: [true, 'name is mandatory'],
     minlength: 2
   },
+  pic: {
+    type: String
+  },
   tokens: [{
     access: {
       type: String,

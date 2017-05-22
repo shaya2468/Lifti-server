@@ -28,6 +28,8 @@ const port = process.env.PORT;
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-auth");
+  res.header("Access-Control-Expose-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-auth");
+
   next();
 });
 
@@ -225,18 +227,18 @@ app.post('/upload', authenticate, (req, res) => {
               if (err) {
                 console.log("Error", err);
                 res.status(404).end();
-                //next('take this already')
+
               } if (data) {
                 console.log("Upload Success", data.Location);
                 res.status(200);
                 res.send('success');
 
-                // var newImage = new singleImageModel({
-                //   fileName: fname,
-                //   votes: 0
-                // }).save(function (err, data) {
-                //   console.log(data);
-                // });
+                User.findOneAndUpdate({_id: req.user._id}, {pic:data.Location})
+                .then((res) => {
+                  console.log(res);
+                }).catch((e) => {
+                  console.log(e);
+                });
 
                 fs.unlink(nfile, function () {
                   console.log(os.tmpDir());
