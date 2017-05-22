@@ -8,6 +8,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {Group} = require('./models/group');
+var {Lift} = require('./models/lift');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
@@ -165,6 +166,81 @@ app.delete('/users/me/token', authenticate, (req, res) => {
   req.user.removeToken(req.token).then(() => {
     res.status(200).send();
   }, () => {
+    res.status(400).send();
+  });
+});
+
+// Lifts
+
+app.post('/lifts', authenticate, (req, res) => {
+
+  var body = {
+      origin: req.body.origin,
+      destination: req.body.destination,
+     _owner : req.user._id,
+     description: req.body.description,
+     capacity: req.body.capacity,
+     groups: [req.body.group_id]
+  }
+  var lift = new Lift(body);
+
+  lift.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.post('/lifts/join/:id', authenticate, (req, res) => {
+
+  var id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Lift.findOne({_id: id})
+  .then((lift) => {
+
+    if (lift.capacity <= lift.riders.length){
+      throw new Error("capacity full");
+    }
+    return Lift.findOneAndUpdate({_id: id, 'riders': {$ne: req.user._id}}, {$push: {riders: req.user._id}}, {runValidators: true})
+
+  }).then((lift) => {
+    if (!lift) {
+      return res.status(404).send();
+    }
+    res.send({});
+  }).catch((e) => {
+    res.status(400).send(e.toString());
+  })
+});
+
+app.get('/lifts/:id', authenticate, (req, res) => {
+  var id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+  Lift.findOne({
+    _id: id
+  }).populate( 'riders').populate('_owner')
+  .then((lift) => {
+    if (!lift) {
+      return res.status(404).send();
+    }
+    var ridersFilteredInfo = lift.riders.map((element) => {
+      return {
+        name:element.name,
+        email:element.email
+      };
+    });
+
+    var returnLift = {owner: lift._owner.name, description: lift.description, origin:lift.origin, destination:lift.destination, riders: ridersFilteredInfo}
+    res.send(returnLift);
+  }).catch((e) => {
+    console.log(e);
     res.status(400).send();
   });
 });

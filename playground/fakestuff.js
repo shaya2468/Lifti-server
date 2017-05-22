@@ -34,6 +34,7 @@ let shaya;
 let simcha;
 let imm;
 let bina;
+let shmulkiz;
 let thisGroup;
 const { users, groups,lifts } = mongoose.connection.collections;
 users.drop(() => {
@@ -67,6 +68,9 @@ users.drop(() => {
          return (u.name === 'bina')
        })[0];
 
+       shmulkiz = result.filter((u) => {
+         return (u.name === 'shmulkiz')
+       })[0];
 
         let group = new Group({
           name: "zehavi",
@@ -76,18 +80,15 @@ users.drop(() => {
       }).then((group) => {
 
         return Promise.all([
-          Group.findOneAndUpdate({_id: group._id, 'members': {$ne: simcha.id}}, {$push: {members: simcha.id}}),
-          Group.findOneAndUpdate({_id: group._id, 'members': {$ne: imm.id}}, {$push: {members: imm.id}}),
-          Group.findOneAndUpdate({_id: group._id, 'members': {$ne: bina.id}}, {$push: {members: bina.id}})
+          Group.findOneAndUpdate({_id: group._id, 'members': {$nin: [simcha.id, imm.id, bina.id]}}, {$push: {members: {$each: [simcha.id, imm.id, bina.id]}}})
         ]);
-
 
       }).then((groups) => {
         if (!groups) {
           console.log('error');
         }
         thisGroup = groups[0];
-        return onDoneFillingDb(thisGroup, simcha, imm);
+        return onDoneFillingDb(thisGroup, simcha, imm, bina, shmulkiz);
       }).then((user) => {
         console.log('done!');
       }).catch((e) => {
@@ -101,7 +102,7 @@ users.drop(() => {
 
 
 //http://stackoverflow.com/questions/25101386/many-to-many-relationship-with-nosql-mongodb-and-mongoose
-var onDoneFillingDb = function(group, simcha, imm){
+var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
   // console.log(group);
   // console.log(simcha);
 
@@ -110,7 +111,7 @@ var onDoneFillingDb = function(group, simcha, imm){
       destination: 'lod',
      _owner : simcha.id,
      description: 'need to love heavy metal',
-     capacity: 3,
+     capacity: 5,
      groups: [group._id]
   }
 
@@ -119,9 +120,15 @@ var onDoneFillingDb = function(group, simcha, imm){
 
   var lift = new Lift(body);
 
-  return lift.save().then((lift) => {
-    // console.log(lift);
-    return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$ne: imm.id}}, {$push: {riders: imm.id}})
+  return lift.save()
+  .then((lift) => {
+    // return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$ne: imm.id}}, {$push: {riders: imm.id}}, {runValidators: true})
+    return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
+  }).then(() => {
+    return true;
+    
+  }).catch((e) => {
+    console.log(e);
   });
 
   // console.log(body);
