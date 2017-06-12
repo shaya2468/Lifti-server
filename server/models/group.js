@@ -7,6 +7,14 @@ const GroupSchema = new Schema({
     required: [true, 'name is mandatory'],
     minlength: 2
   },
+  description: {
+    type: String,
+    required: [true, 'description is mandatory'],
+    minlength: 2
+  },
+  pic: {
+    type: String
+  },
   _manager: { type: Schema.Types.ObjectId, ref: 'user' },
   members: [{
     type: Schema.Types.ObjectId,

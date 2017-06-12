@@ -42,10 +42,12 @@ app.use(methodOverride());
 app.post('/groups', authenticate, (req, res) => {
   var group = new Group({
     name: req.body.name,
+    description: req.body.description,
     _manager: req.user._id
   });
 
   group.save().then((doc) => {
+    console.log(doc);
     res.send(doc);
   }, (e) => {
     res.status(400).send(e);
@@ -193,14 +195,14 @@ app.post('/upload', authenticate, (req, res) => {
     }
 
 
-    var tmpFile, nFile, fname;
+    var tmpFile, nFile, fname, groupId;
     var newForm = new formidable.IncomingForm();
         newForm.keepExtensions = true,
         newForm.parse(req, function(err, fields, files){
         console.log('error');
         console.log(err);
-        console.log(fields);
 
+         groupId = fields.group_id;
          tmpFile = files.upload.path;
          fname = generateFileName(files.upload.name);
          console.log(fname);
@@ -230,19 +232,22 @@ app.post('/upload', authenticate, (req, res) => {
 
               } if (data) {
                 console.log("Upload Success", data.Location);
-                res.status(200);
-                res.send('success');
 
-                User.findOneAndUpdate({_id: req.user._id}, {pic:data.Location})
-                .then((res) => {
-                  console.log(res);
+
+                var doc = groupId ? Group: User;
+                var _id = groupId ? groupId: req.user._id;
+
+                doc.findOneAndUpdate({_id},  { $set: { pic: data.Location } }, { new: true })
+                .then((result) => {
+                  res.status(200);
+                  res.send(result);
                 }).catch((e) => {
-                  console.log(e);
+                  res.status(404).end();
                 });
 
                 fs.unlink(nfile, function () {
-                  console.log(os.tmpDir());
-                  console.log('local file deleted');
+                console.log(os.tmpDir());
+                console.log('local file deleted');
                 });
 
               }
