@@ -77,9 +77,34 @@ users.drop(() => {
           description: "ajzner dudes",
           _manager: shaya.id
         });
-        return group.save();
-      }).then((group) => {
 
+        let group2 = new Group({
+          name: "beatles",
+          description: "love da beatles ",
+          _manager: shaya.id
+        });
+
+        let group3 = new Group({
+          name: "beer sheva studs",
+          description: "uni of b7",
+          _manager: shaya.id
+        });
+
+        let group4 = new Group({
+          name: "lod",
+          description: "garin people",
+          _manager: shaya.id
+        });
+
+        let group5 = new Group({
+          name: "mars",
+          description: "group for martians",
+          _manager: shaya.id
+        });
+        return Promise.all([group.save(), group2.save(), group3.save(), group4.save(), group5.save()]);
+        // return group.save();
+      }).then((groups) => {
+        var group = groups[0];
         return Promise.all([
           Group.findOneAndUpdate({_id: group._id, 'members': {$nin: [simcha.id, imm.id, bina.id]}}, {$push: {members: {$each: [simcha.id, imm.id, bina.id]}}})
         ]);
