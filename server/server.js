@@ -122,22 +122,35 @@ app.get('/groups/search/:query', authenticate, (req, res) => {
   Group.find({
     name: new RegExp(query, 'i')
   }).populate( 'members')
-  .then((group) => {
+  .then((groups) => {
 
-    res.send(group);
+    if (!groups){
+      res.send([]);
+      return;
+    }
 
-    // if (!group) {
-    //   return res.status(404).send();
-    // }
-    // var membersFilteredInfo = group.members.map((element) => {
-    //   return {
-    //     name:element.name,
-    //     email:element.email
-    //   };
-    // });
-    //
-    // var returnGroup = {name: group.name, members: membersFilteredInfo}
-    // res.send(returnGroup);
+    var groupsEnhanced = groups.map((groupElement) => {
+      var membersFilteredInfo = groupElement.members.map((element) => {
+        return {
+          id: element._id,
+          name:element.name,
+          email:element.email
+
+        };
+      });
+
+      return{
+        id: groupElement._id,
+        name: groupElement.name,
+        description: groupElement.description,
+        members: membersFilteredInfo
+      }
+
+
+    })
+
+    res.send(groupsEnhanced);
+
   }).catch((e) => {
     console.log(e);
     res.status(400).send();
