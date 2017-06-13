@@ -74,6 +74,7 @@ users.drop(() => {
 
         let group = new Group({
           name: "zehavi",
+          description: "ajzner dudes",
           _manager: shaya.id
         });
         return group.save();
@@ -126,7 +127,7 @@ var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
     return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
   }).then(() => {
     return true;
-    
+
   }).catch((e) => {
     console.log(e);
   });
