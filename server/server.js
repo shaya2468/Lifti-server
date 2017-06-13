@@ -116,6 +116,34 @@ app.get('/groups/:id', authenticate, (req, res) => {
   });
 });
 
+app.get('/groups/search/:query', authenticate, (req, res) => {
+  var query = req.params.query;
+
+  Group.find({
+    name: new RegExp(query, 'i')
+  }).populate( 'members')
+  .then((group) => {
+
+    res.send(group);
+
+    // if (!group) {
+    //   return res.status(404).send();
+    // }
+    // var membersFilteredInfo = group.members.map((element) => {
+    //   return {
+    //     name:element.name,
+    //     email:element.email
+    //   };
+    // });
+    //
+    // var returnGroup = {name: group.name, members: membersFilteredInfo}
+    // res.send(returnGroup);
+  }).catch((e) => {
+    console.log(e);
+    res.status(400).send();
+  });
+});
+
 app.delete('/groups/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
