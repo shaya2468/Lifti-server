@@ -143,6 +143,7 @@ app.get('/groups/search/:query', authenticate, (req, res) => {
         id: groupElement._id,
         name: groupElement.name,
         description: groupElement.description,
+        image: groupElement.pic,
         members: membersFilteredInfo
       }
 
