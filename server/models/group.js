@@ -22,6 +22,19 @@ const GroupSchema = new Schema({
   }]
 });
 
+GroupSchema.methods.userStatus = function(userId) {
+  if (this._manager.toString() === userId.toString()){
+    return 'manager';
+  }
+
+  if (this.members.some(member => member.toString() === userId.toString())){
+    return 'member';
+  }
+
+  return 'non_member'
+
+};
+
 const Group = mongoose.model('group', GroupSchema);
 
 module.exports = {Group};

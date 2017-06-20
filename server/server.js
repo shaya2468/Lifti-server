@@ -78,10 +78,20 @@ app.post('/groups/join/:id', authenticate, (req, res) => {
 });
 
 app.get('/groups', authenticate, (req, res) => {
-  Group.find({
-    _manager: req.user._id
+  Group.find({$or:[{_manager: req.user._id}, {'members': {$in: [req.user._id]}}]
+
   }).then((groups) => {
-    res.send({groups});
+
+    var groupsFiltered = groups.map((group) => {
+        var groupTemp = new Group({name: group.name, description: group.description, pic: group.pic, _manager: group._manager, members: group.members});
+        return {
+          name:group.name,
+          description:group.description,
+          pic: group.pic,
+          user_status:groupTemp.userStatus(req.user._id)
+        };
+    })
+    res.send({groupsFiltered});
   }, (e) => {
     res.status(400).send(e);
   });
