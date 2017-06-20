@@ -328,18 +328,25 @@ app.delete('/users/me/token', authenticate, (req, res) => {
 app.post('/lifts', authenticate, (req, res) => {
 
   var body = {
-      origin: req.body.origin,
-      destination: req.body.destination,
+      origin_city: req.body.origin_city,
+      origin_street: req.body.origin_street,
+      destination_city: req.body.destination_city,
+      destination_street: req.body.destination_street,
      _owner : req.user._id,
      description: req.body.description,
+     leave_at:req.body.leave_at,
      capacity: req.body.capacity,
-     groups: [req.body.group_id]
+     groups: [new ObjectID(req.body.groups[0])]
   }
+
   var lift = new Lift(body);
 
   lift.save().then((doc) => {
-    res.send(doc);
+
+    res.status(200).send(doc);
   }, (e) => {
+    console.log('error');
+    console.log(e);
     res.status(400).send(e);
   });
 });

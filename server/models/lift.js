@@ -2,16 +2,28 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const LiftSchema = new Schema({
-  origin: {
+  origin_city: {
     type: String,
-    required: [true, 'origin is mandatory'],
-    minlength: 2
+    required: [true, 'origin_city is mandatory'],
+    minlength: 1
   },
 
-  destination: {
+  origin_street: {
     type: String,
-    required: [true, 'origin is mandatory'],
-    minlength: 2
+    required: [true, 'origin_street is mandatory'],
+    minlength: 1
+  },
+
+  destination_city: {
+    type: String,
+    required: [true, 'destination_city is mandatory'],
+    minlength: 1
+  },
+
+  destination_street: {
+    type: String,
+    required: [true, 'destination_street is mandatory'],
+    minlength: 1
   },
 
   description: String,
@@ -19,6 +31,11 @@ const LiftSchema = new Schema({
   capacity: {
     type: Number,
     required: [true, 'capacity is mandatory']
+  },
+
+  leave_at: {
+    type: Number,
+    required: [true, 'leave_at is mandatory']
   },
 
   _owner: { type: Schema.Types.ObjectId, ref: 'user' },

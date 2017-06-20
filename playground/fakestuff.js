@@ -105,8 +105,10 @@ users.drop(() => {
         // return group.save();
       }).then((groups) => {
         var group = groups[0];
+        var group2 = groups[1];
         return Promise.all([
-          Group.findOneAndUpdate({_id: group._id, 'members': {$nin: [simcha.id, imm.id, bina.id]}}, {$push: {members: {$each: [simcha.id, imm.id, bina.id]}}})
+          Group.findOneAndUpdate({_id: group._id, 'members': {$nin: [simcha.id, imm.id, bina.id]}}, {$push: {members: {$each: [simcha.id, imm.id, bina.id]}}}),
+          Group.findOneAndUpdate({_id: group2._id, 'members': {$nin: [simcha.id]}}, {$push: {members: {$each: [simcha.id]}}}),
         ]);
 
       }).then((groups) => {
@@ -151,8 +153,14 @@ var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
     // return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$ne: imm.id}}, {$push: {riders: imm.id}}, {runValidators: true})
     return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
   }).then(() => {
-    return true;
+    console.log('i am at the very end');
 
+    return Group.find({'members': {$in: [simcha.id]}}).then((groups) => {
+        console.log(groups);
+        return true;
+    }).catch((e) => {
+      console.log('error right here aa ' + e );
+    });
   }).catch((e) => {
     console.log(e);
   });
