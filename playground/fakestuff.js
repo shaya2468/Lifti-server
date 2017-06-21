@@ -136,11 +136,15 @@ var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
 
   var body = {
       origin: 'beer sheva',
-      destination: 'lod',
+      destination_street: 'rachel alter',
+      destination_city: 'lod',
+      origin_street: 'alentbi 34',
+      origin_city: 'tel aviv',
      _owner : simcha.id,
      description: 'need to love heavy metal',
      capacity: 5,
-     groups: [group._id]
+     groups: [group._id],
+     leave_at: 1234
   }
 
   // var body = {name: "shaya", email:"shaya@gmail.com", password:"123456"}
