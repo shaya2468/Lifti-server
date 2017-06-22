@@ -29,6 +29,7 @@ module.exports = (app) => {
   app.post('/upload', authenticate, UploadController.upload),
 
   //perms
-  app.post('/perms', authenticate, PermController.create)
+  app.post('/perms', authenticate, PermController.create),
+  app.get('/perms', authenticate, PermController.getForUser)
 
 };

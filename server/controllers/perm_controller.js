@@ -1,4 +1,5 @@
 const {Perm} = require('../models/perm');
+const {Group} = require('../models/group');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 
@@ -9,8 +10,7 @@ module.exports = {
     // now the 2 index uniqueness doesn't work, need investigation.
     Perm.find({_group: req.body.group_id, _applicant: req.user._id})
       .then((res) => {
-        console.log(res);
-        console.log(res.length);
+
         if (res.length > 0){
           throw({message: "request already exists"})
         }
@@ -29,5 +29,32 @@ module.exports = {
         console.log(e);
         res.status(400).send(e);
       })
+  },
+
+  getForUser(req, res) {
+    Group.find({_manager:req.user._id})
+    .then((groups) => {
+
+      var groupIds = groups.map(function(doc) { return doc._id; });
+      return Perm.find({_group: {$in: groupIds}}).populate('_applicant').populate('_group')
+
+    }).then((perms) => {
+
+      var permsFiltered = perms.map((perm) => {
+
+          return {
+            group_id:perm._group.id,
+            group_name: perm._group.name,
+            applicant_id: perm._applicant.id,
+            applicant_name: perm._applicant.name,
+            applicant_pic: perm._applicant.pic
+          };
+      })
+
+      res.send(permsFiltered);
+    }).catch((e) => {
+      console.log(e);
+      res.status(400).send(e);
+    })
   }
 }
