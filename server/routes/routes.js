@@ -1,6 +1,7 @@
 const GroupController = require('../controllers/group_controller');
 const UserController = require('../controllers/user_controller');
 const LiftController = require('../controllers/lift_controller');
+const UploadController = require('../controllers/upload_controller');
 var {authenticate} = require('../middleware/authenticate');
 module.exports = (app) => {
 
@@ -21,5 +22,9 @@ module.exports = (app) => {
   // lifts
   app.post('/lifts', authenticate, LiftController.create),
   app.post('/lifts/join/:id', authenticate, LiftController.join),
-  app.get('/lifts/:id', authenticate, LiftController.getLiftById)
+  app.get('/lifts/:id', authenticate, LiftController.getLiftById),
+
+  // upload
+  app.post('/upload', authenticate, UploadController.upload)
+
 };
