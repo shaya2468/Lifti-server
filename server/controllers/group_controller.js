@@ -1,4 +1,5 @@
 const {Group} = require('../models/group');
+const {Perm} = require('../models/perm');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 module.exports = {
@@ -78,30 +79,35 @@ module.exports = {
         res.send([]);
         return;
       }
-
-      var groupsEnhanced = groups.map((groupElement) => {
-        var membersFilteredInfo = groupElement.members.map((element) => {
-          return {
-            id: element._id,
-            name:element.name,
-            email:element.email
-
-          };
-        });
-
-        return{
-          id: groupElement._id,
-          name: groupElement.name,
-          description: groupElement.description,
-          image: groupElement.pic,
-          members: membersFilteredInfo
-        }
+      var groupIds = groups.map((group) => group._id);
 
 
+      return Perm.find({_group: {$in: groupIds}, _applicant:req.user._id}).then((perms) => {
+
+        var groupsSentPerms = perms.map((perm) => perm._group);
+
+        var groupsEnhanced = groups.map((groupElement) => {
+            var membersFilteredInfo = groupElement.members.map((element) => {
+              return {
+                id: element._id,
+                name:element.name,
+                email:element.email
+
+              };
+            });
+
+            return{
+              id: groupElement._id,
+              name: groupElement.name,
+              description: groupElement.description,
+              image: groupElement.pic,
+              members: membersFilteredInfo,
+              user_status: groupsSentPerms.some(item => item.toString() === groupElement._id.toString()) ? 'permission_request_sent' : groupElement.userStatus(req.user._id)
+            }
+          })
+
+          res.send(groupsEnhanced);
       })
-
-      res.send(groupsEnhanced);
-
     }).catch((e) => {
       console.log(e);
       res.status(400).send();
