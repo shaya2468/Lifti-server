@@ -40,29 +40,6 @@ app.use(methodOverride());
 
 routes(app);
 
-app.post('/groups/join/:id', authenticate, (req, res) => {
-
-  var id = req.params.id;
-
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
-
-  //http://stackoverflow.com/questions/15921700/mongoose-unique-values-in-nested-array-of-objects
-  Group.findOneAndUpdate({_id: id, 'members': {$ne: req.user._id}}, {$push: {members: req.user._id}})
-  .then((group) => {
-    if (!group) {
-      return res.status(404).send();
-    }
-    res.send({});
-
-  }).catch((e) => {
-    console.log(e);
-    res.status(400).send();
-  })
-
-});
-
 app.get('/groups', authenticate, (req, res) => {
   Group.find({$or:[{_manager: req.user._id}, {'members': {$in: [req.user._id]}}]
 
