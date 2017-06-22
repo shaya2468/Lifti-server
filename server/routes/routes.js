@@ -30,6 +30,8 @@ module.exports = (app) => {
 
   //perms
   app.post('/perms', authenticate, PermController.create),
-  app.get('/perms', authenticate, PermController.getForUser)
+  app.get('/perms', authenticate, PermController.getForUser),
+  app.post('/perms/accept', authenticate, PermController.accept),
+  app.post('/perms/reject', authenticate, PermController.reject)
 
 };

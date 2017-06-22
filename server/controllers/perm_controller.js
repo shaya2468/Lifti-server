@@ -56,5 +56,35 @@ module.exports = {
       console.log(e);
       res.status(400).send(e);
     })
+  },
+
+  accept(req, res) {
+    var groupId = req.body.group_id;
+    var applicantId = req.body.applicant_id;
+
+    return Promise.all([Perm.remove({_group:groupId, _applicant: applicantId}),
+                      Group.findOneAndUpdate({_id: groupId, 'members': {$ne: applicantId}}, {$push: {members: applicantId}}, {new: true})])
+                      .then((result) => {
+                        res.send({});
+
+                      }).catch((e) => {
+                        console.log(e);
+                        res.status(400).send(e);
+                      })
+  },
+
+  reject(req, res) {
+    var groupId = req.body.group_id;
+    var applicantId = req.body.applicant_id;
+
+    return Perm.remove({_group:groupId, _applicant: applicantId})
+                      .then((result) => {
+                        console.log(result);
+                        res.send({});
+
+                      }).catch((e) => {
+                        console.log(e);
+                        res.status(400).send(e);
+                      })
   }
 }
