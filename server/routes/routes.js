@@ -2,6 +2,7 @@ const GroupController = require('../controllers/group_controller');
 const UserController = require('../controllers/user_controller');
 const LiftController = require('../controllers/lift_controller');
 const UploadController = require('../controllers/upload_controller');
+const PermController = require('../controllers/perm_controller');
 var {authenticate} = require('../middleware/authenticate');
 module.exports = (app) => {
 
@@ -25,6 +26,9 @@ module.exports = (app) => {
   app.get('/lifts/:id', authenticate, LiftController.getLiftById),
 
   // upload
-  app.post('/upload', authenticate, UploadController.upload)
+  app.post('/upload', authenticate, UploadController.upload),
+
+  //perms
+  app.post('/perms', authenticate, PermController.create)
 
 };
