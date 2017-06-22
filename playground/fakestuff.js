@@ -108,7 +108,7 @@ users.drop(() => {
         var group2 = groups[1];
         return Promise.all([
           Group.findOneAndUpdate({_id: group._id, 'members': {$nin: [simcha.id, imm.id, bina.id]}}, {$push: {members: {$each: [simcha.id, imm.id, bina.id]}}}),
-          Group.findOneAndUpdate({_id: group2._id, 'members': {$nin: [simcha.id]}}, {$push: {members: {$each: [simcha.id]}}}),
+          Group.findOneAndUpdate({_id: group2._id, 'members': {$nin: [simcha.id]}}, {$push: {members: {$each: [simcha.id]}}})
         ]);
 
       }).then((groups) => {
