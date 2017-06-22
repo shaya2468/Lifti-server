@@ -1,6 +1,5 @@
 require('./config/config');
-var
-  path = require('path'),
+var path = require('path'),
 
   fs = require('fs'),
   os = require('os'),
@@ -21,7 +20,7 @@ var {Group} = require('./models/group');
 var {Lift} = require('./models/lift');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
-
+var routes = require('./routes/routes')
 var app = express();
 const port = process.env.PORT;
 
@@ -39,20 +38,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(methodOverride());
 
-app.post('/groups', authenticate, (req, res) => {
-  var group = new Group({
-    name: req.body.name,
-    description: req.body.description,
-    _manager: req.user._id
-  });
-
-  group.save().then((doc) => {
-    console.log(doc);
-    res.send(doc);
-  }, (e) => {
-    res.status(400).send(e);
-  });
-});
+routes(app);
 
 app.post('/groups/join/:id', authenticate, (req, res) => {
 
