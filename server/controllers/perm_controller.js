@@ -47,7 +47,8 @@ module.exports = {
             group_name: perm._group.name,
             applicant_id: perm._applicant.id,
             applicant_name: perm._applicant.name,
-            applicant_pic: perm._applicant.pic
+            applicant_pic: perm._applicant.pic,
+            message: perm.message
           };
       })
 

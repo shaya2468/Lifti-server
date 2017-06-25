@@ -72,7 +72,7 @@ module.exports = {
 
     Group.find({
       name: new RegExp(query, 'i')
-    }).populate( 'members')
+    })
     .then((groups) => {
 
       if (!groups){
@@ -95,6 +95,9 @@ module.exports = {
 
               };
             });
+
+            // for now we don't populate membersFilteredInfo so it will return nothing for now, i moved the populate because
+            // of a bug in userStatus
 
             return{
               id: groupElement._id,
