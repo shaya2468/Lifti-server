@@ -32,7 +32,7 @@ module.exports = {
             user_status:groupTemp.userStatus(req.user._id)
           };
       })
-      res.send({groupsFiltered});
+      res.send({groups:groupsFiltered});
     }, (e) => {
       res.status(400).send(e);
     });
