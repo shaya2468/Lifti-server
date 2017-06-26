@@ -26,6 +26,7 @@ module.exports = {
       var groupsFiltered = groups.map((group) => {
           var groupTemp = new Group({name: group.name, description: group.description, pic: group.pic, _manager: group._manager, members: group.members});
           return {
+            id: group._id,
             name:group.name,
             description:group.description,
             pic: group.pic,
