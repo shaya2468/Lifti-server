@@ -13,7 +13,7 @@ module.exports = {
        description: req.body.description,
        leave_at:req.body.leave_at,
        capacity: req.body.capacity,
-       groups: [new ObjectID(req.body.groups[0])]
+       groups: req.body.groups
     }
 
     var lift = new Lift(body);
