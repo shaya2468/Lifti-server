@@ -36,6 +36,7 @@ module.exports = (app) => {
   app.post('/perms/reject', authenticate, PermController.reject),
 
   //cities
-  app.post('/cities', authenticate, CitiesController.get)
+  app.post('/cities', authenticate, CitiesController.add),
+  app.get('/cities', authenticate, CitiesController.getAll)
 
 };

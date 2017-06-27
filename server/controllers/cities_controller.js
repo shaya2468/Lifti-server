@@ -3,7 +3,7 @@ const {City} = require('../models/city');
 
 module.exports = {
 
-  get(req, res) {
+  add(req, res) {
    var cities = req.body.cities;
    var citiesObjects = cities.map((city) => {
       return newCity = new City({name: city});
@@ -14,5 +14,20 @@ module.exports = {
    }).catch((e) => {
      res.status(400).send(e);
   })
- }
+},
+
+getAll(req, res){
+
+  var projection = {
+    __v: false,
+  };
+
+  City.find({}, projection).then((cities) => {
+
+    res.send(cities);
+  }, (e) => {
+    res.status(400).send(e);
+  });
+}
+
 };
