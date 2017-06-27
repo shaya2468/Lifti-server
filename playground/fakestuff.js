@@ -159,14 +159,24 @@ var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
 
       return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
     }).then((lift) => {
-      console.log('i am at the very end');
+
+      console.log('i finished initing the lift');
       console.log(lift);
-      return Group.find({'members': {$in: [simcha.id]}}).then((groups) => {
-          // console.log(groups);
-          return true;
-      }).catch((e) => {
-        console.log('error right here aa ' + e );
-      });
+
+      return Lift.find({"leave_at": {$gt: 123, $lt: 17000}, origin_city:'595239148cc174ffe21bf9b9', destination_city:'595239148cc174ffe21bf9b8'})
+      .then((result) => {
+        console.log('i am at the very end of greater than');
+        console.log(result);
+        return Group.find({'members': {$in: [simcha.id]}})
+        .then((groups) => {
+            // console.log(groups);
+            return true;
+        }).catch((e) => {
+          console.log('error right here aa ' + e );
+        });
+
+      })
+
     }).catch((e) => {
       console.log(e);
     });
