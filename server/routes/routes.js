@@ -3,6 +3,7 @@ const UserController = require('../controllers/user_controller');
 const LiftController = require('../controllers/lift_controller');
 const UploadController = require('../controllers/upload_controller');
 const PermController = require('../controllers/perm_controller');
+const CitiesController = require('../controllers/cities_controller');
 var {authenticate} = require('../middleware/authenticate');
 module.exports = (app) => {
 
@@ -32,6 +33,9 @@ module.exports = (app) => {
   app.post('/perms', authenticate, PermController.create),
   app.get('/perms', authenticate, PermController.getForUser),
   app.post('/perms/accept', authenticate, PermController.accept),
-  app.post('/perms/reject', authenticate, PermController.reject)
+  app.post('/perms/reject', authenticate, PermController.reject),
+
+  //cities
+  app.post('/cities', authenticate, CitiesController.get)
 
 };
