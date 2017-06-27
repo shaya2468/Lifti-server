@@ -18,11 +18,13 @@ module.exports = {
 
 getAll(req, res){
 
-  var projection = {
-    __v: false,
-  };
+  // not neccacary, because in the city model i removed it. just keeping around for future reference
+  // var projection = {
+  //   __v: false,
+  // };
+  // City.find({}, projection).then((cities) => {
 
-  City.find({}, projection).then((cities) => {
+  City.find().then((cities) => {
 
     res.send(cities);
   }, (e) => {
