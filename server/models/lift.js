@@ -2,11 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const LiftSchema = new Schema({
-  origin_city: {
-    type: String,
-    required: [true, 'origin_city is mandatory'],
-    minlength: 1
-  },
+
+  origin_city: { type: Schema.Types.ObjectId, ref: 'city' },
 
   origin_street: {
     type: String,
@@ -14,11 +11,7 @@ const LiftSchema = new Schema({
     minlength: 1
   },
 
-  destination_city: {
-    type: String,
-    required: [true, 'destination_city is mandatory'],
-    minlength: 1
-  },
+  destination_city: { type: Schema.Types.ObjectId, ref: 'city' },
 
   destination_street: {
     type: String,
