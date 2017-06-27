@@ -7,6 +7,7 @@ var {mongoose} = require('../server/db/mongoose');
 var {Group} = require('../server/models/group');
 var {User} = require('../server/models/user');
 var {Lift} = require('../server/models/lift');
+var {City} = require('../server/models/city');
 
 
 
@@ -36,7 +37,7 @@ let imm;
 let bina;
 let shmulkiz;
 let thisGroup;
-const { users, groups,lifts } = mongoose.connection.collections;
+const { users, groups,lifts, cities } = mongoose.connection.collections;
 users.drop(() => {
   groups.drop(() => {
     lifts.drop(() => {
@@ -134,40 +135,48 @@ var onDoneFillingDb = function(group, simcha, imm, bina, shmulkiz){
   // console.log(group);
   // console.log(simcha);
 
-  var body = {
-      origin: 'beer sheva',
-      destination_street: 'rachel alter',
-      destination_city: 'lod',
-      origin_street: 'alentbi 34',
-      origin_city: 'tel aviv',
-     _owner : simcha.id,
-     description: 'need to love heavy metal',
-     capacity: 5,
-     groups: [group._id],
-     leave_at: 1234
-  }
 
-  // var body = {name: "shaya", email:"shaya@gmail.com", password:"123456"}
-  // var user = new User(body);
+  City.find()
+  .then((cities) => {
+    // console.log(cities);
+    var body = {
+        destination_street: 'rachel alter',
+        destination_city: cities[0]._id,
+        origin_street: 'alentbi 34',
+        origin_city: cities[1]._id,
+       _owner : simcha.id,
+       description: 'need to love heavy metal',
+       capacity: 5,
+       groups: [group._id],
+       leave_at: 1234
+    }
 
-  var lift = new Lift(body);
+    var lift = new Lift(body);
 
-  return lift.save()
-  .then((lift) => {
-    // return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$ne: imm.id}}, {$push: {riders: imm.id}}, {runValidators: true})
-    return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
-  }).then(() => {
-    console.log('i am at the very end');
+    return lift.save()
+    .then((lift) => {
+      // return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$ne: imm.id}}, {$push: {riders: imm.id}}, {runValidators: true})
 
-    return Group.find({'members': {$in: [simcha.id]}}).then((groups) => {
-        console.log(groups);
-        return true;
+      return Lift.findOneAndUpdate({_id: lift._id, 'riders': {$nin: [imm.id, bina.id]}}, { $push: {riders: {$each: [imm.id, bina.id]}}}, {runValidators: true});
+    }).then((lift) => {
+      console.log('i am at the very end');
+      console.log(lift);
+      return Group.find({'members': {$in: [simcha.id]}}).then((groups) => {
+          // console.log(groups);
+          return true;
+      }).catch((e) => {
+        console.log('error right here aa ' + e );
+      });
     }).catch((e) => {
-      console.log('error right here aa ' + e );
+      console.log(e);
     });
-  }).catch((e) => {
+  }, (e) => {
     console.log(e);
   });
+
+
+
+
 
   // console.log(body);
 }
