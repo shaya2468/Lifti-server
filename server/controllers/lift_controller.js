@@ -1,5 +1,7 @@
 const {Lift} = require('../models/lift');
 const {ObjectID} = require('mongodb');
+const {Group} = require('../models/group');
+
 const _ = require('lodash');
 
 module.exports = {
@@ -79,5 +81,22 @@ module.exports = {
       console.log(e);
       res.status(400).send();
     });
+  },
+
+  getLiftsByQuery(req, res){
+    const {origin_city, destination_city, from_time, till_time}  = req.query;
+
+    Group.find({$or:[{_manager: req.user._id}, {'members': {$in: [req.user._id]}}]
+
+    }).then((groups) => {
+      var groupIds = groups.map((group) => group._id);
+      return Lift.find({'groups': {$in: groupIds}, origin_city, destination_city, "leave_at": {$gt: from_time, $lt: till_time}})
+    }).then((lifts) => {
+      console.log(lifts);
+      res.send(lifts);
+    })
+
+
+
   }
 };

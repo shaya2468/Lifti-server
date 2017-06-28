@@ -24,7 +24,8 @@ module.exports = (app) => {
   // lifts
   app.post('/lifts', authenticate, LiftController.create),
   app.post('/lifts/join/:id', authenticate, LiftController.join),
-  app.get('/lifts/:id', authenticate, LiftController.getLiftById),
+  // app.get('/lifts/:id', authenticate, LiftController.getLiftById), this is disabled for now, because i don't use it and it prevents me from using the bottom one, the bott
+  app.get('/lifts', authenticate, LiftController.getLiftsByQuery),
 
   // upload
   app.post('/upload', authenticate, UploadController.upload),
