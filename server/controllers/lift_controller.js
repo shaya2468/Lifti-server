@@ -89,7 +89,11 @@ module.exports = {
 
     }).then((groups) => {
       var groupIds = groups.map((group) => group._id);
-      return Lift.find({'groups': {$in: groupIds}, origin_city, destination_city, "leave_at": {$gt: from_time, $lt: till_time}}).populate('origin_city').populate('destination_city')
+      return Lift.find({'groups': {$in: groupIds}, origin_city, destination_city,
+                        "leave_at": {$gt: from_time, $lt: till_time}})
+                        .populate('origin_city')
+                        .populate('destination_city')
+                        .populate('_owner')
     }).then((lifts) => {
       console.log(lifts);
       res.send(lifts);
