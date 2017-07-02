@@ -94,8 +94,13 @@ module.exports = {
                         .populate('origin_city')
                         .populate('destination_city')
                         .populate('_owner')
+                        .populate('riders')
     }).then((lifts) => {
-      console.log(lifts);
+
+      lifts.forEach((lift) => {
+        lift.userStatus(req.user._id)
+      })
+
       res.send(lifts);
     }).catch((e) => {
       console.log(e);

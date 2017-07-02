@@ -20,7 +20,7 @@ const LiftSchema = new Schema({
   },
 
   description: String,
-
+  user_status: String,
   capacity: {
     type: Number,
     required: [true, 'capacity is mandatory']
@@ -63,6 +63,31 @@ LiftSchema.pre('update', function(next)  {
   this.options.runValidators = true;
   next();
 });
+
+LiftSchema.set('toJSON', {
+     transform: function (doc, ret, options) {
+         ret.id = ret._id;
+         delete ret._id;
+         delete ret.__v;
+     }
+});
+
+LiftSchema.methods.userStatus = function(userId) {
+
+  if (this._owner._id.toString() === userId.toString()){
+    this.user_status = 'owner'
+    return 'owner';
+  }
+
+  if (this.riders.some(rider => rider._id.toString() === userId.toString())){
+    this.user_status = 'rider'
+    return 'rider';
+  }
+
+  this.user_status = 'none';
+  return 'none'
+
+};
 
 const Lift = mongoose.model('lift', LiftSchema);
 
