@@ -43,13 +43,13 @@ module.exports = {
       if (lift.capacity <= lift.riders.length){
         throw new Error("capacity full");
       }
-      return Lift.findOneAndUpdate({_id: id, 'riders': {$ne: req.user._id}}, {$push: {riders: req.user._id}}, {runValidators: true})
+      return Lift.findOneAndUpdate({_id: id, 'riders': {$ne: req.user._id}}, {$push: {riders: req.user._id}}, {new: true}).populate('riders')
 
     }).then((lift) => {
       if (!lift) {
         return res.status(404).send();
       }
-      res.send({});
+      res.send(lift);
     }).catch((e) => {
       res.status(400).send(e.toString());
     })
@@ -95,6 +95,7 @@ module.exports = {
                         .populate('destination_city')
                         .populate('_owner')
                         .populate('riders')
+                        .sort({leave_at: 1})
     }).then((lifts) => {
 
       lifts.forEach((lift) => {
