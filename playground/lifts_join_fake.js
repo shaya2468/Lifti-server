@@ -80,6 +80,15 @@ users.drop(() => {
         saveUserPromise("duff", "duff@gmail.com", "123456", "https://goo.gl/4FctND"),
         saveUserPromise("izzy", "izzy@gmail.com", "123456", "https://goo.gl/gu6jSb"),
 
+        saveUserPromise("fred", "fred@gmail.com", "123456", "https://goo.gl/AQw9UZ"),
+        saveUserPromise("wilma", "wilma@gmail.com", "123456", "https://goo.gl/qXFPv4"),
+        saveUserPromise("barney", "barney@gmail.com", "123456", "https://goo.gl/ocK7e3"),
+        saveUserPromise("betty", "betty@gmail.com", "123456", "https://goo.gl/AGh2SX"),
+        saveUserPromise("daffy", "daffy@gmail.com", "123456", "https://goo.gl/cLpVSX"),
+        saveUserPromise("bugs", "bugs@gmail.com", "123456", "http://www.toonopedia.com/bugs.jpg"),
+        saveUserPromise("elmo", "elmo@gmail.com", "123456", "https://goo.gl/U6p8WZ"),
+        saveUserPromise("tweety", "tweety@gmail.com", "123456", "https://goo.gl/jY4grq")
+
 
       ])
       .then((result) => {
@@ -120,18 +129,23 @@ users.drop(() => {
         thisGroup = groups[0];
 
         return Promise.all([
-        onDoneFillingDb(thisGroup, "2017-07-02 15:30", "king david 12", "rothshild 43", 0 , 4, 5 ,6)
-        ,onDoneFillingDb(thisGroup, "2017-07-02 14:30", "ben gurion 4", "alenbi 56", 1 , 2, 3)
-        ,onDoneFillingDb(thisGroup, "2017-07-02 15:30", "king david 12", "rothshild 43", 4 , 5, 6 ,7),
+        onDoneFillingDb(thisGroup, "2017-07-02 15:30", "king david 12", "rothshild 43","Be on time or I will kill you!", 0 , 4, 5 ,6)
+        ,onDoneFillingDb(thisGroup, "2017-07-02 14:30", "ben gurion 4", "alenbi 56", "air conditioning is blazing", 1 , 2, 3)
+        ,onDoneFillingDb(thisGroup, "2017-07-02 15:30", "king david 12", "rothshild 43","", 4 , 5, 6 ,7),
 
-        ,onDoneFillingDb(thisGroup, "2017-07-02 20:10", "akiva 43", "shvarts 121", 2 , 12, 3 ,3),
-        ,onDoneFillingDb(thisGroup, "2017-07-02 19:20", "achuza 22", "habonim 1", 17 , 6),
-        ,onDoneFillingDb(thisGroup, "2017-07-02 20:30", "borochov 252", "bar ilan 772", 3 , 14, 8 ),
-        ,onDoneFillingDb(thisGroup, "2017-07-02 17:30", "jerusalem", "rokchim 34", 14 , 15, 16 ,18),
-        ,onDoneFillingDb(thisGroup, "2017-07-02 18:30", "hachayil 55", "rachbal 88", 16 , 19),
-        ,onDoneFillingDb(thisGroup, "2017-07-02 19:15", "akiva 112", "rashi 11", 3 , 15, 10 ,8),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 20:10", "akiva 43", "shvarts 121","we'll be listening to dark side of the moon",  2 , 12, 3 ,3),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 19:20", "achuza 22", "habonim 1","", 17 , 6),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 20:30", "borochov 252", "bar ilan 772", "I am the red skoda", 3 , 14, 8 ),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 17:30", "jerusalem", "rokchim 34","", 14 , 15, 16 ,18),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 18:30", "hachayil 55", "rachbal 88", "driving 140 kph so don't say you weren't told", 16 , 19),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 19:15", "akiva 112", "rashi 11","", 3 , 15, 10 ,8),
 
-        ,onDoneFillingDb(thisGroup, "2017-07-02 16:00", "walengerb 5", "begin 22", 6 , 1, 11 ,12)])
+        ,onDoneFillingDb(thisGroup, "2017-07-02 19:45", "boker 112", "rashi 11","", 21 , 22, 3 ,23),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 19:20", "lechi 112", "tikva 11","", 24 , 26, 25 ,0),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 13:45", "etzel 112", "hape 11","", 0 , 23, 11 ,14),
+        ,onDoneFillingDb(thisGroup, "2017-07-02 14:15", "nachal 112", "achidak 11","loony toones everyone", 2 , 3, 22 ,15),
+
+        ,onDoneFillingDb(thisGroup, "2017-07-02 16:00", "walengerb 5", "begin 22","", 6 , 1, 11 ,12)])
 
       }).then((user) => {
         console.log('done!');
@@ -146,7 +160,7 @@ users.drop(() => {
 
 
 //http://stackoverflow.com/questions/25101386/many-to-many-relationship-with-nosql-mongodb-and-mongoose
-var onDoneFillingDb = function(group, date, origin_street, destination_street, owner, rider1, rider2, rider3){
+var onDoneFillingDb = function(group, date, origin_street, destination_street, message, owner, rider1, rider2, rider3){
 
 
 
@@ -161,7 +175,7 @@ var onDoneFillingDb = function(group, date, origin_street, destination_street, o
         origin_street,
         origin_city: cities[1]._id,
        _owner: everybody[owner],
-       description: 'need to love heavy metal',
+       description: message,
        capacity: 5,
        groups: [group._id],
        leave_at: timestamp
