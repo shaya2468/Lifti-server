@@ -46,8 +46,7 @@ module.exports = {
       return res.status(404).send();
     }
     Group.findOne({
-      _id: id,
-      _manager: req.user._id
+      _id: id
     }).populate( 'members')
     .then((group) => {
       if (!group) {
@@ -56,7 +55,9 @@ module.exports = {
       var membersFilteredInfo = group.members.map((element) => {
         return {
           name:element.name,
-          email:element.email
+          email:element.email,
+          pic:element.pic
+
         };
       });
 
