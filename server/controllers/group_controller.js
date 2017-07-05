@@ -55,9 +55,7 @@ module.exports = {
       var membersFilteredInfo = group.members.map((element) => {
         return {
           name:element.name,
-          email:element.email,
           pic:element.pic
-
         };
       });
 
