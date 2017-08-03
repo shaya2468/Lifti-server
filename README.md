@@ -59,6 +59,7 @@ main fields:
 ### Authorization/Security:
 
 Bycrypt is used for storing passwords securely.
+
 JWT, with a predefined salt, is used to grant access tokens.
 Every time a user dispatches an api, he must send the access token in the header, which will be verified on the server and used to identify the user.
 
