@@ -64,7 +64,7 @@ JWT, with a predefined salt, is used to grant access tokens.
 Every time a user dispatches an api, he must send the access token in the header, which will be verified on the server and used to identify the user.
 
 
-# Public api's
+### Public api's
 
 
 
