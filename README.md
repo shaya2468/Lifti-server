@@ -3,6 +3,26 @@
 In this document we'll discuss the high level design and the thought process behind Lifti.
 To read about what the app does, how to use it and the main flow of the application please see this article [here](https://medium.com/@shayaajzner/test-test-test-67027d263a3b)
 
+### Public api's
+
+
+
+    POST /users - sign up
+    POST /users/login - login
+
+    POST /groups - create a group
+    GET /groups - get all groups the user is a member or manager of
+    GET /groups/search/:query- search for a group
+
+    POST /lifts - create a lift
+    POST /lifts/join/:id - join a lift with an id.
+    GET /lifts - get all lifts that answer a specific time and place query
+
+    POST /perms - send a permission request to join a group
+    GET /perms - get all the permission requests, that were sent to the groups that I am the manger of
+    POST /perms/accept - accept a permission request, the user who sent it, will now be a member of the group.
+    POST /perms/reject - reject a permission request
+
 ### Data Models
 
 ### How the models all relate to each other:
@@ -64,22 +84,4 @@ JWT, with a predefined salt, is used to grant access tokens.
 Every time a user dispatches an api, he must send the access token in the header, which will be verified on the server and used to identify the user.
 
 
-### Public api's
 
-
-
-    POST /users - sign up
-    POST /users/login - login
-
-    POST /groups - create a group
-    GET /groups - get all groups the user is a member or manager of
-    GET /groups/search/:query- search for a group
-
-    POST /lifts - create a lift
-    POST /lifts/join/:id - join a lift with an id.
-    GET /lifts - get all lifts that answer a specific time and place query
-
-    POST /perms - send a permission request to join a group
-    GET /perms - get all the permission requests, that were sent to the groups that I am the manger of
-    POST /perms/accept - accept a permission request, the user who sent it, will now be a member of the group.
-    POST /perms/reject - reject a permission request
