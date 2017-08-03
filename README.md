@@ -3,9 +3,9 @@
 In this document we'll discuss the high level design and the thought process behind Lifti.
 To read about what the app does, how to use it and the main flow of the application please see this article [here](https://medium.com/@shayaajzner/test-test-test-67027d263a3b)
 
-###Data Models
+### Data Models
 
-####User
+#### User
 Simple Entity that represents a user who registered to the system. 
 
 main fields:
@@ -14,7 +14,7 @@ main fields:
 2. password
 3. name
 
-####Group
+#### Group
 Represents a secure group, where only a manager can grant other users permission to join.
 
 main fields:
@@ -24,7 +24,7 @@ main fields:
 3. manager - the user who is the manager of the group
 4. members - list of the users, who are members of the group.
 
-####Lift
+#### Lift
 A lift can be created by any user, and he may add it to the groups he chooses.
 
 main fields:
@@ -36,7 +36,7 @@ main fields:
 5. owner - the user who created the lift
 6. groups - the groups that this ride will appear in
 
-####Permission
+#### Permission
 A permission request sent by a user, to join a group
 
 main fields:
@@ -44,7 +44,7 @@ main fields:
 1. group - the group the user requests to join
 2. applicant - the user who wants to join a group
 
-####City
+#### City
 A list of cities that a user that you can take lifts in. For now it's a hard coded list.
 
 main fields:
