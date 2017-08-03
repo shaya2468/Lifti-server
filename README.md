@@ -58,5 +58,9 @@ main fields:
 ![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bRDdJUEJtRHRzdG8)
 
 
+### Authorization/Security:
+
+Bycrypt is used for storing passwords securely.
+JWT, with a predefined salt, is used to grant access tokens
 
 
