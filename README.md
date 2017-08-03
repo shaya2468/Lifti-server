@@ -1,6 +1,6 @@
 # Lifti — Lifts associated with groups
 
-In this document we'll discuss the high level design and the thought process behind Lifti.
+In this document we'll discuss the high level design behind Lifti.
 To read about what the app does, how to use it and the main flow of the application please see this article [here](https://medium.com/@shayaajzner/test-test-test-67027d263a3b)
 
 ### Public api's
