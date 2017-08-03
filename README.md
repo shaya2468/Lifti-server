@@ -53,7 +53,7 @@ main fields:
 
 
 
-###How the models all relate to each other:
+### How the models all relate to each other:
 
 ![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bRDdJUEJtRHRzdG8)
 
