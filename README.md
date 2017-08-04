@@ -3,6 +3,12 @@
 In this document we'll discuss the high level design behind Lifti.
 To read about what the app does, how to use it and the main flow of the application please see this article [here](https://medium.com/@shayaajzner/test-test-test-67027d263a3b)
 
+### Main data flow
+
+
+![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bMXIxUzFRWkpuNlk)
+
+
 ### Public api's
 
 
