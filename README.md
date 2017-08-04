@@ -11,9 +11,9 @@ To read about what the app does and how to use it please see this article [here]
 
 ![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bMXIxUzFRWkpuNlk)
 
-A user/client dispatches an api request to 'server', who is in charge of listening to the requests and sends it to 'routes'.
+A user/client dispatches an api request to *server*, who is in charge of listening to the requests and sends it to *routes*.
 
-routes is in charge of mapping the request to the appropriate 'controller'.
+routes is in charge of mapping the request to the appropriate *controller*.
 
 The controller's job is to 
 
