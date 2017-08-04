@@ -13,7 +13,7 @@ To read about what the app does and how to use it please see this article [here]
 
 A user dispatches an api request to the server, which sends it to the routes.js file, who is in charge
 of routing it to the appropriate controller. The controller's job is to parse the data from the request, perform the
-proper db operation and returns a response to the user. expressJS is used for managing the requests.
+proper db operation and return a response to the user. expressJS is used for managing the requests.
 
 ### Public api's
 
