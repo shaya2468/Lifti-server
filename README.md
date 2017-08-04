@@ -11,7 +11,7 @@ To read about what the app does and how to use it please see this article [here]
 
 ![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bMXIxUzFRWkpuNlk)
 
-A user dispatches an api request to the server, which sends it to the routes.js file, who is in charge
+A user/client dispatches an api request to the server, which sends it to the routes.js file, who is in charge
 of routing it to the appropriate controller. The controller's job is to parse the data from the request, perform the
 proper db operation and return a response to the user. expressJS is used for handling the requests.
 
