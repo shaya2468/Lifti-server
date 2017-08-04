@@ -11,9 +11,17 @@ To read about what the app does and how to use it please see this article [here]
 
 ![Image of Yaktocat](https://drive.google.com/uc?id=0B_ciQLEjqv8bMXIxUzFRWkpuNlk)
 
-A user/client dispatches an api request to the server, which sends it to the routes.js file, who is in charge
-of routing it to the appropriate controller. The controller's job is to parse the data from the request, perform the
-proper db operation and return a response to the user. expressJS is used for handling the requests.
+A user/client dispatches an api request to 'server', who is in charge of listening to the requests and sends it to 'routes'.
+
+routes is in charge of mapping the request to the appropriate 'controller'.
+
+The controller's job is to 
+
+1. parse the data from the request
+
+2. perform the proper db operation
+
+3. return a response to the user according to what mongoDB returned. expressJS is used for handling the requests.
 
 ### Public api's
 
