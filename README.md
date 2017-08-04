@@ -17,11 +17,11 @@ routes is in charge of mapping the request to the appropriate 'controller'.
 
 The controller's job is to 
 
-1. parse the data from the request
+1. Parse the data from the request
 
-2. perform the proper db operation
+2. Execute the proper db operation
 
-3. return a response to the user according to what mongoDB returned. expressJS is used for handling the requests.
+3. Return a response to the user according to what mongoDB returned. expressJS is used for handling the requests.
 
 ### Public api's
 
