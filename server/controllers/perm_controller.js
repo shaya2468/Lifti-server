@@ -80,7 +80,6 @@ module.exports = {
 
     return Perm.remove({_group:groupId, _applicant: applicantId})
                       .then((result) => {
-                        console.log(result);
                         res.send({});
 
                       }).catch((e) => {

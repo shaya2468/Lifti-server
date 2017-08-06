@@ -8,12 +8,13 @@ const {Lift} = require('./../models/lift');
 const {User} = require('./../models/user');
 
 const {app} = require('./../server');
-const {populateGroups, populateUsers, populateLifts, populateCities, users, groups, lifts, cities, dateLift1} = require('./seed/seed');
+const {populateGroups, populateUsers, populateLifts, populateCities, populatePerms, users, groups, lifts, cities, dateLift1, perms} = require('./seed/seed');
 
 beforeEach(populateUsers);
 beforeEach(populateGroups);
 beforeEach(populateCities);
 beforeEach(populateLifts);
+beforeEach(populatePerms);
 
 describe('POST /groups', () => {
   it('should create a new group', (done) => {
@@ -497,5 +498,80 @@ describe('GET /lifts', () => {
         });
     })
   });
+});
+
+
+describe('GET /perms', () => {
+  it('should return all permissions request to the manger of the group', (done) => {
+
+    request(app)
+      .get('/perms')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.length).toBe(1);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
+  });
+
+  it('should accpet perm request', (done) => {
+    var body = {
+      group_id:perms[0]._group,
+      applicant_id: perms[0]._applicant
+    }
+
+    request(app)
+      .post('/perms/accept')
+      .set('x-auth', users[0].tokens[0].token)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Group.find().then((groups) => {
+          expect(groups[0].members.length).toBe(1);
+          expect(groups[0].members[0].toString()).toBe(body.applicant_id.toString());
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+  it('should reject perm request', (done) => {
+    var body = {
+      group_id:perms[0]._group,
+      applicant_id: perms[0]._applicant
+    }
+
+    request(app)
+      .post('/perms/reject')
+      .set('x-auth', users[0].tokens[0].token)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Group.find().then((groups) => {
+          expect(groups[0].members.length).toBe(0);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+
 
 });

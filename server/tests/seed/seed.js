@@ -6,6 +6,7 @@ const {Group} = require('./../../models/group');
 const {Lift} = require('./../../models/lift');
 const {City} = require('./../../models/city');
 const {User} = require('./../../models/user');
+const {Perm} = require('./../../models/perm');
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
@@ -64,6 +65,19 @@ const lift1 = {
 
 const lifts = [lift1]
 
+const perm1 = {
+  _group: groups[0]._id,
+  _applicant: users[1]._id
+}
+
+const perms = [perm1]
+
+const populatePerms= (done) => {
+  Perm.remove({}).then(() => {
+    return Perm.insertMany(perms);
+  }).then(() => done());
+};
+
 const populateGroups = (done) => {
   Group.remove({}).then(() => {
     return Group.insertMany(groups);
@@ -94,4 +108,4 @@ const populateCities = (done) => {
   }).then(() => done());
 }
 
-module.exports = {populateGroups, populateUsers, populateLifts, populateCities,  users, groups, lifts, cities, dateLift1};
+module.exports = {populateGroups, populateUsers, populateLifts, populateCities, populatePerms, users, perms, groups, lifts, cities, dateLift1};
