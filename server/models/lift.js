@@ -53,7 +53,6 @@ const LiftSchema = new Schema({
 });
 
 function arrayLimit(val) {
-  console.log('got here with ' + val.length);
   return val.length < this.capacity;
 }
 

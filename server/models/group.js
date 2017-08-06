@@ -24,7 +24,6 @@ const GroupSchema = new Schema({
 
 GroupSchema.set('toJSON', {
      transform: function (doc, ret, options) {
-       console.log('transformers!!!!');
          ret.id = ret._id;
          delete ret._id;
          delete ret.__v;

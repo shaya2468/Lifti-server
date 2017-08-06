@@ -18,16 +18,22 @@ module.exports = {
        groups: req.body.groups
     }
 
-    var lift = new Lift(body);
+    Group.find({$and: [{'_id': {$in: body.groups}}, {$or:[{_manager: req.user._id}, {'members': {$in: [req.user._id]}}]}]})
+    .then((result) => {
 
-    lift.save().then((doc) => {
+      if (result.length != body.groups.length){
+        throw new Error("user does not belong to all groups");
+      }
 
+      var lift = new Lift(body);
+      return lift.save()
+    })
+    .then((doc) => {
       res.status(200).send(doc);
-    }, (e) => {
-      console.log('error');
-      console.log(e);
+    })
+    .catch((e) => {
       res.status(400).send(e);
-    });
+    })
   },
 
   join(req, res) {
@@ -85,6 +91,7 @@ module.exports = {
 
   getLiftsByQuery(req, res){
     const {origin_city, destination_city, from_time, till_time}  = req.query;
+
     Group.find({$or:[{_manager: req.user._id}, {'members': {$in: [req.user._id]}}]
 
     }).then((groups) => {

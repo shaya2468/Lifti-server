@@ -4,13 +4,16 @@ const request = require('supertest');
 const {ObjectID} = require('mongodb');
 
 const {Group} = require('./../models/group');
+const {Lift} = require('./../models/lift');
 const {User} = require('./../models/user');
 
 const {app} = require('./../server');
-const {populateGroups, populateUsers, users, groups} = require('./seed/seed');
+const {populateGroups, populateUsers, populateLifts, populateCities, users, groups, lifts, cities, dateLift1} = require('./seed/seed');
 
 beforeEach(populateUsers);
 beforeEach(populateGroups);
+beforeEach(populateCities);
+beforeEach(populateLifts);
 
 describe('POST /groups', () => {
   it('should create a new group', (done) => {
@@ -335,4 +338,164 @@ describe('POST /users/login', () => {
         }).catch((e) => done(e));
       });
   });
+});
+
+describe('POST /lifts', () => {
+  it('should create a new lift', (done) => {
+
+    request(app)
+      .post('/lifts')
+      .set('x-auth', users[0].tokens[0].token)
+      .send(lifts[0])
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.origin_city.toString()).toBe(lifts[0].origin_city.toString());
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Lift.find({origin_city:lifts[0].origin_city}).then((lifts) => {
+          expect(lifts.length).toBe(1);
+          expect(lifts[0].destination_street).toBe(lifts[0].destination_street);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+  it('should not be able to create lift in group that user does not belong to', (done) => {
+
+    request(app)
+      .post('/lifts')
+      .set('x-auth', users[1].tokens[0].token)
+      .send(lifts[0])
+      .expect(400)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Lift.find().then((lifts) => {
+          expect(lifts.length).toBe(0);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+});
+
+
+describe('GET /lifts', () => {
+  it('should find lifts in time frame', (done) => {
+
+    var body = lifts[0];
+    var lift1 = new Lift(body);
+    lift1.save()
+    .then((result) => {
+      request(app)
+        .get('/lifts')
+        .set('x-auth', users[0].tokens[0].token)
+        .query({
+          origin_city: cities[0]._id.toString(),
+          destination_city: cities[1]._id.toString(),
+          from_time: dateLift1 - 100,
+          till_time: dateLift1 + 100
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.length).toBe(1);
+        })
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          done();
+        });
+    })
+  });
+
+  it('should not find lifts that exist, but not for any of the groups the user is in', (done) => {
+
+    var body = lifts[0];
+    var lift1 = new Lift(body);
+    lift1.save()
+    .then((result) => {
+      request(app)
+        .get('/lifts')
+        .set('x-auth', users[1].tokens[0].token)
+        .query({
+          origin_city: cities[0]._id.toString(),
+          destination_city: cities[1]._id.toString(),
+          from_time: dateLift1 - 100,
+          till_time: dateLift1 + 100
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.length).toBe(0);
+        })
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          done();
+        });
+    })
+  });
+
+  it('should not find lifts that do not exist in time frame', (done) => {
+
+    var body = lifts[0];
+    var lift1 = new Lift(body);
+    lift1.save()
+    .then((result) => {
+      request(app)
+        .get('/lifts')
+        .set('x-auth', users[0].tokens[0].token)
+        .query({
+          origin_city: cities[0]._id.toString(),
+          destination_city: cities[1]._id.toString(),
+          from_time: dateLift1 + 100,
+          till_time: dateLift1 + 200
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.length).toBe(0);
+        })
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          done();
+        });
+    })
+  });
+
+  it('should not find lifts that do not exist origin and destination city', (done) => {
+
+    var body = lifts[0];
+    var lift1 = new Lift(body);
+    lift1.save()
+    .then((result) => {
+      request(app)
+        .get('/lifts')
+        .set('x-auth', users[0].tokens[0].token)
+        .query({
+          origin_city: cities[1]._id.toString(),
+          destination_city: cities[0]._id.toString(),
+          from_time: dateLift1 - 100,
+          till_time: dateLift1 + 100
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.length).toBe(0);
+        })
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          done();
+        });
+    })
+  });
+
 });

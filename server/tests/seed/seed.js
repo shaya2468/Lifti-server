@@ -1,11 +1,15 @@
 const {ObjectID} = require('mongodb');
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const {Group} = require('./../../models/group');
+const {Lift} = require('./../../models/lift');
+const {City} = require('./../../models/city');
 const {User} = require('./../../models/user');
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+const dateLift1 = moment("2017-06-29 14:00", "YYYY/MM/DD HH:mm").unix();
 const users = [{
   _id: userOneId,
   name:'john',
@@ -43,10 +47,33 @@ const groups = [{
   _manager: userTwoId
 }];
 
+const cities = [{_id: new ObjectID(),name:"city1" }, {_id: new ObjectID(),name:"city2" }, {_id: new ObjectID(),name:"city3" }];
+
+const lift1 = {
+  _id: new ObjectID(),
+  origin_city: cities[0]._id,
+  origin_street: 'origin street 1',
+  destination_city: cities[1]._id,
+  destination_street: 'destination street 1',
+  _owner : users[0]._id,
+  description: 'description 1',
+  leave_at:dateLift1,
+  capacity: 3,
+  groups: [groups[0]._id]
+}
+
+const lifts = [lift1]
+
 const populateGroups = (done) => {
   Group.remove({}).then(() => {
     return Group.insertMany(groups);
   }).then(() => done());
+};
+
+const populateLifts = (done) => {
+  Lift.remove({}).then(() => {
+    done();
+  })
 };
 
 const populateUsers = (done) => {
@@ -57,4 +84,14 @@ const populateUsers = (done) => {
   }).then(() => done());
 };
 
-module.exports = {populateGroups, populateUsers, users, groups};
+const populateCities = (done) => {
+  var citiesObjects = cities.map((city) => {
+     return newCity = new City(city);
+  })
+
+  City.remove({}).then(() => {
+    return City.insertMany(citiesObjects);
+  }).then(() => done());
+}
+
+module.exports = {populateGroups, populateUsers, populateLifts, populateCities,  users, groups, lifts, cities, dateLift1};
