@@ -4,7 +4,6 @@ const _ = require('lodash');
 
 module.exports = {
   create(req, res) {
-    console.log('ddddiiiii');
     var body = _.pick(req.body, ['email', 'password', 'name']);
     var user = new User(body);
 

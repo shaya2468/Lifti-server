@@ -1,97 +1,124 @@
+
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
 
-const {app} = require('./../server');
-const {Todo} = require('./../models/todo');
+const {Group} = require('./../models/group');
 const {User} = require('./../models/user');
-const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
+
+const {app} = require('./../server');
+const {populateGroups, populateUsers, users, groups} = require('./seed/seed');
 
 beforeEach(populateUsers);
-beforeEach(populateTodos);
+beforeEach(populateGroups);
 
-describe('POST /todos', () => {
-  it('should create a new todo', (done) => {
-    var text = 'Test todo text';
+describe('POST /groups', () => {
+  it('should create a new group', (done) => {
 
+    var name = 'groupAAA';
+    var description = 'descriptionAAA';
+    var body = {
+      name, description
+    }
     request(app)
-      .post('/todos')
+      .post('/groups')
       .set('x-auth', users[0].tokens[0].token)
-      .send({text})
+      .send(body)
       .expect(200)
       .expect((res) => {
-        expect(res.body.text).toBe(text);
+        expect(res.body.name).toBe(name);
       })
       .end((err, res) => {
         if (err) {
           return done(err);
         }
-
-        Todo.find({text}).then((todos) => {
-          expect(todos.length).toBe(1);
-          expect(todos[0].text).toBe(text);
+        Group.find({name}).then((groups) => {
+          expect(groups.length).toBe(1);
+          expect(groups[0].name).toBe(body.name);
           done();
         }).catch((e) => done(e));
       });
   });
 
-  it('should not create todo with invalid body data', (done) => {
+  it('should not create group with name that is to short', (done) => {
+
+    var name = '1';
+    var description = 'descriptionAAA';
+    var body = {
+      name, description
+    }
     request(app)
-      .post('/todos')
+      .post('/groups')
       .set('x-auth', users[0].tokens[0].token)
-      .send({})
+      .send(body)
       .expect(400)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
 
-        Todo.find().then((todos) => {
-          expect(todos.length).toBe(2);
+        Group.find().then((groups) => {
+          expect(groups.length).toBe(groups.length);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+  it('should not create group with missing description', (done) => {
+
+    var name = '1234';
+    var body = {
+      name
+    }
+    request(app)
+      .post('/groups')
+      .set('x-auth', users[0].tokens[0].token)
+      .send(body)
+      .expect(400)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Group.find().then((groups) => {
+          expect(groups.length).toBe(groups.length);
           done();
         }).catch((e) => done(e));
       });
   });
 });
 
-describe('GET /todos', () => {
-  it('should get all todos', (done) => {
+describe('GET /groups', () => {
+  it('should get all groups of user', (done) => {
     request(app)
-      .get('/todos')
+      .get('/groups')
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(1);
+        expect(res.body.groups.length).toBe(2);
       })
       .end(done);
   });
 });
 
-describe('GET /todos/:id', () => {
-  it('should return todo doc', (done) => {
+
+describe('GET /groups/:id', () => {
+  it('should return group with specified id', (done) => {
     request(app)
-      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .get(`/groups/${groups[0]._id.toHexString()}`)
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(todos[0].text);
+        expect(res.body.name).toBe(groups[0].name);
       })
       .end(done);
   });
 
-  it('should not return todo doc created by other user', (done) => {
-    request(app)
-      .get(`/todos/${todos[1]._id.toHexString()}`)
-      .set('x-auth', users[0].tokens[0].token)
-      .expect(404)
-      .end(done);
-  });
-
-  it('should return 404 if todo not found', (done) => {
+  it('should return 404 if group not found', (done) => {
     var hexId = new ObjectID().toHexString();
 
     request(app)
-      .get(`/todos/${hexId}`)
+      .get(`/groups/${hexId}`)
       .set('x-auth', users[0].tokens[0].token)
       .expect(404)
       .end(done);
@@ -99,127 +126,85 @@ describe('GET /todos/:id', () => {
 
   it('should return 404 for non-object ids', (done) => {
     request(app)
-      .get('/todos/123abc')
+      .get('/groups/123abc')
       .set('x-auth', users[0].tokens[0].token)
       .expect(404)
       .end(done);
   });
 });
 
-describe('DELETE /todos/:id', () => {
-  it('should remove a todo', (done) => {
-    var hexId = todos[1]._id.toHexString();
 
+describe('GET /groups/search/:query', () => {
+  it('should return groups that answer search cirteria', (done) => {
     request(app)
-      .delete(`/todos/${hexId}`)
-      .set('x-auth', users[1].tokens[0].token)
+      .get(`/groups/search/gro`)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo._id).toBe(hexId);
+        expect(res.body.length).toBe(groups.length);
       })
-      .end((err, res) => {
-        if (err) {
-          return done(err);
-        }
-
-        Todo.findById(hexId).then((todo) => {
-          expect(todo).toNotExist();
-          done();
-        }).catch((e) => done(e));
-      });
-  });
-
-  it('should remove a todo', (done) => {
-    var hexId = todos[0]._id.toHexString();
-
-    request(app)
-      .delete(`/todos/${hexId}`)
-      .set('x-auth', users[1].tokens[0].token)
-      .expect(404)
-      .end((err, res) => {
-        if (err) {
-          return done(err);
-        }
-
-        Todo.findById(hexId).then((todo) => {
-          expect(todo).toExist();
-          done();
-        }).catch((e) => done(e));
-      });
-  });
-
-  it('should return 404 if todo not found', (done) => {
-    var hexId = new ObjectID().toHexString();
-
-    request(app)
-      .delete(`/todos/${hexId}`)
-      .set('x-auth', users[1].tokens[0].token)
-      .expect(404)
       .end(done);
   });
 
-  it('should return 404 if object id is invalid', (done) => {
+  it('should return no groups because no groups contain the query', (done) => {
     request(app)
-      .delete('/todos/123abc')
-      .set('x-auth', users[1].tokens[0].token)
-      .expect(404)
+      .get(`/groups/search/jjj`)
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.length).toBe(0);
+      })
       .end(done);
   });
 });
 
-describe('PATCH /todos/:id', () => {
-  it('should update the todo', (done) => {
-    var hexId = todos[0]._id.toHexString();
-    var text = 'This should be the new text';
+describe('DELETE /groups/:id', () => {
+  it('should remove a group', (done) => {
+    var hexId = groups[0]._id.toHexString();
 
     request(app)
-      .patch(`/todos/${hexId}`)
+      .delete(`/groups/${hexId}`)
       .set('x-auth', users[0].tokens[0].token)
-      .send({
-        completed: true,
-        text
-      })
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(text);
-        expect(res.body.todo.completed).toBe(true);
-        expect(res.body.todo.completedAt).toBeA('number');
+        expect(res.body.group.id).toBe(hexId);
       })
-      .end(done);
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Group.findById(hexId).then((group) => {
+          expect(group).toNotExist();
+          done();
+        }).catch((e) => done(e));
+      });
   });
 
-  it('should not update the todo created by other user', (done) => {
-    var hexId = todos[0]._id.toHexString();
-    var text = 'This should be the new text';
+  it('should fail to remove a group that user is not manager of', (done) => {
+    var hexId = groups[0]._id.toHexString();
 
     request(app)
-      .patch(`/todos/${hexId}`)
+      .delete(`/groups/${hexId}`)
       .set('x-auth', users[1].tokens[0].token)
-      .send({
-        completed: true,
-        text
-      })
       .expect(404)
-      .end(done);
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Group.findById(hexId).then((group) => {
+          expect(group).toExist();
+          done();
+        }).catch((e) => done(e));
+      });
   });
 
-  it('should clear completedAt when todo is not completed', (done) => {
-    var hexId = todos[1]._id.toHexString();
-    var text = 'This should be the new text!!';
-
+  it('should return 404 if group id is invalid', (done) => {
     request(app)
-      .patch(`/todos/${hexId}`)
+      .delete('/groups/123abc')
       .set('x-auth', users[1].tokens[0].token)
-      .send({
-        completed: false,
-        text
-      })
-      .expect(200)
-      .expect((res) => {
-        expect(res.body.todo.text).toBe(text);
-        expect(res.body.todo.completed).toBe(false);
-        expect(res.body.todo.completedAt).toNotExist();
-      })
+      .expect(404)
       .end(done);
   });
 });
@@ -248,14 +233,16 @@ describe('GET /users/me', () => {
   });
 });
 
+
 describe('POST /users', () => {
   it('should create a user', (done) => {
     var email = 'example@example.com';
     var password = '123mnb!';
+    var name = "gregory"
 
     request(app)
       .post('/users')
-      .send({email, password})
+      .send({email, password, name})
       .expect(200)
       .expect((res) => {
         expect(res.headers['x-auth']).toExist();
@@ -291,7 +278,8 @@ describe('POST /users', () => {
       .post('/users')
       .send({
         email: users[0].email,
-        password: 'Password123!'
+        password: 'Password123!',
+        name:'gregory'
       })
       .expect(400)
       .end(done);
@@ -343,25 +331,6 @@ describe('POST /users/login', () => {
 
         User.findById(users[1]._id).then((user) => {
           expect(user.tokens.length).toBe(1);
-          done();
-        }).catch((e) => done(e));
-      });
-  });
-});
-
-describe('DELETE /users/me/token', () => {
-  it('should remove auth token on logout', (done) => {
-    request(app)
-      .delete('/users/me/token')
-      .set('x-auth', users[0].tokens[0].token)
-      .expect(200)
-      .end((err, res) => {
-        if (err) {
-          return done(err);
-        }
-
-        User.findById(users[0]._id).then((user) => {
-          expect(user.tokens.length).toBe(0);
           done();
         }).catch((e) => done(e));
       });
